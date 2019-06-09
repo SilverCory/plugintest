@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/SilverCory/plugintest/api"
 )
 
@@ -18,12 +20,18 @@ func (p *Plug1) Init(owner api.Owner) error {
 	return nil
 }
 
+func (p *Plug1) Name() string {
+	return "Plug1"
+}
+
 func (p *Plug1) Enable() error {
-	fmt.Println(p.owner.GetThing(), "ENABLING")
+	go func() {
+		time.Sleep(3 * time.Second)
+		fmt.Printf("%s says: %q\n", p.Name(), p.owner.GetThing())
+	}()
 	return nil
 }
 
 func (p *Plug1) Disable() error {
-	fmt.Println(p.owner.GetThing(), "DISABLING")
 	return nil
 }

@@ -2,48 +2,28 @@ package main
 
 import (
 	"fmt"
-	"plugin"
+	"os"
+	"os/signal"
 
 	"github.com/SilverCory/plugintest/api"
 )
 
 func main() {
-	app := &App{thing: "Hello World"}
-	pl, err := plugin.Open("plug1.so")
-	if err != nil {
-		panic(err)
+	app := &App{
+		thing:   "Hello World",
+		plugins: map[string]api.Plugin{},
 	}
 
-	sym, err := pl.Lookup("New")
-	if err != nil {
-		panic(err)
-	}
+	app.startup()
+	fmt.Println("APP STARTED.")
 
-	new, ok := sym.(func() api.Plugin)
-	if !ok {
-		fmt.Printf("type not new plugin, %#v\n", sym)
-		panic("type not plug")
-	}
+	app.enable()
+	fmt.Println("PLUGINS ENABLED; DONE")
 
-	plug := new()
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
 
-	if err := plug.Init(app); err != nil {
-		panic(err)
-	}
-
-	if err := plug.Enable(); err != nil {
-		panic(err)
-	}
-
-	if err := plug.Disable(); err != nil {
-		panic(err)
-	}
-}
-
-type App struct {
-	thing string
-}
-
-func (a *App) GetThing() string {
-	return a.thing
+	fmt.Println("\nSHUTTING DOWN")
+	app.disable()
 }

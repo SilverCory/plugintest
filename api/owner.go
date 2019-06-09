@@ -1,11 +1,6 @@
 package api
 
+// Owner is the owner of all plugins?
 type Owner interface {
 	GetThing() string
-}
-
-type Plugin interface {
-	Init(owner Owner) error
-	Enable() error
-	Disable() error
 }
