@@ -9,7 +9,7 @@ import (
 
 func main() {
 	app := &App{thing: "Hello World"}
-	pl, err := plugin.Open("plugin.dll")
+	pl, err := plugin.Open("plug1.so")
 	if err != nil {
 		panic(err)
 	}
@@ -19,11 +19,13 @@ func main() {
 		panic(err)
 	}
 
-	plug, ok := sym.(api.Plugin)
+	new, ok := sym.(func() api.Plugin)
 	if !ok {
-		fmt.Println("type not plugin, ", plug)
+		fmt.Printf("type not new plugin, %#v\n", sym)
 		panic("type not plug")
 	}
+
+	plug := new()
 
 	if err := plug.Init(app); err != nil {
 		panic(err)
